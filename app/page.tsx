@@ -8,6 +8,7 @@ export default function Page() {
                 <Icon name="ic_circle" />
                 <Icon name="ic_square" />
                 <Icon name="ic_star" />
+                <Icon name="ic_opacity" />
             </p>
         </main>
     );

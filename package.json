@@ -5,7 +5,11 @@
     "icons": "react-native-nano-icons --path .",
     "dev": "next dev --webpack",
     "build": "next build --webpack",
-    "start": "next start"
+    "start": "next start",
+    "icons:xmldom-0.8": "bash scripts/icons-xmldom-0.8.sh",
+    "icons:xmldom-0.8:fixed": "FIX=1 bash scripts/icons-xmldom-0.8.sh",
+    "fix:on": "bash scripts/fix.sh on",
+    "fix:off": "bash scripts/fix.sh off"
   },
   "dependencies": {
     "next": "16.3.1",
@@ -18,8 +22,5 @@
     "@types/node": "24.0.0",
     "@types/react": "19.2.0",
     "typescript": "5.9.3"
-  },
-  "patchedDependencies": {
-    "react-native-nano-icons@1.0.0": "patches/react-native-nano-icons@1.0.0.patch"
   }
 }

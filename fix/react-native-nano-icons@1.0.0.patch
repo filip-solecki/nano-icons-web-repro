@@ -1,3 +1,36 @@
+diff --git a/lib/commonjs/src/core/glyph/parse.js b/lib/commonjs/src/core/glyph/parse.js
+index 6d18f22218b8715d7615e5c326af90b560b2c0fb..1c39b6a9c987e3964e21ffbd20525e2cfa141461 100644
+--- a/lib/commonjs/src/core/glyph/parse.js
++++ b/lib/commonjs/src/core/glyph/parse.js
+@@ -7,11 +7,13 @@ exports.shouldSkipPath = shouldSkipPath;
+ const xmldom_1 = require("@xmldom/xmldom");
+ const parse_1 = require("../../utils/parse");
+ const svgPatterns_1 = require("../../utils/svgPatterns");
++// xmldom 0.8 returns '' for a missing attribute and undefined for a missing parent
++const getAttr = (el, name) => el.hasAttribute(name) ? el.getAttribute(name) : null;
+ // if the fill is implicit, walk ancestors for the first explicit fill value
+ function resolveInheritedFill(el) {
+     let current = el.parentElement;
+-    while (current !== null) {
+-        const fill = current.getAttribute('fill');
++    while (current) {
++        const fill = getAttr(current, 'fill');
+         if (fill !== null && fill !== 'inherit')
+             return fill;
+         current = current.parentElement;
+@@ -47,9 +49,9 @@ function sanitizePathData(d) {
+ }
+ const parsePath = (p) => {
+     const d = p.getAttribute('d') ?? '';
+-    const op = p.getAttribute('opacity');
+-    const fillOp = p.getAttribute('fill-opacity');
+-    const fill = p.getAttribute('fill');
++    const op = getAttr(p, 'opacity');
++    const fillOp = getAttr(p, 'fill-opacity');
++    const fill = getAttr(p, 'fill');
+     // flattening may drop fill-rule but preserve clip-rule; treat either as evenodd
+     const fillRule = p.getAttribute('fill-rule') === 'evenodd' ||
+         p.getAttribute('clip-rule') === 'evenodd'
 diff --git a/lib/module/createNanoIconsSet.shared.js b/lib/module/createNanoIconsSet.shared.js
 index 04fe34fec2bb06e993977ec85583a2311aaf919f..c97372f9f15e4a1b97d068395a475e623284481c 100644
 --- a/lib/module/createNanoIconsSet.shared.js

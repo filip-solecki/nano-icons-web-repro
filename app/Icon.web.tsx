@@ -19,7 +19,7 @@ if (typeof document !== "undefined" && typeof FontFace !== "undefined") {
 
 const NanoIcon = createNanoIconSet(glyphMap);
 
-export type IconName = "ic_circle" | "ic_square" | "ic_star";
+export type IconName = "ic_circle" | "ic_opacity" | "ic_square" | "ic_star";
 
 export const Icon = ({name, size = 32}: {name: IconName; size?: number}) => (
     <NanoIcon name={name} size={size} color="#013369" />
