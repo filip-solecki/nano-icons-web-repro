@@ -1,0 +1,63 @@
+diff --git a/lib/module/createNanoIconsSet.shared.js b/lib/module/createNanoIconsSet.shared.js
+index 04fe34fec2bb06e993977ec85583a2311aaf919f..c97372f9f15e4a1b97d068395a475e623284481c 100644
+--- a/lib/module/createNanoIconsSet.shared.js
++++ b/lib/module/createNanoIconsSet.shared.js
+@@ -26,7 +26,7 @@ export function warnIfLinkingMismatch(fontFamily, linking, font) {
+     void reportMissingDynamicFont(fontFamily);
+     return;
+   }
+-  if (__DEV__ && !isDynamic && font != null) {
++  if ((typeof __DEV__ !== 'undefined' && __DEV__) && !isDynamic && font != null) {
+     warnRuntime(`Icon font "${configuredFontFamily(fontFamily)}" is built with static linking, so the font passed to createNanoIconSet is ignored. ` + `Set linking: 'dynamic' in your config to deliver it at runtime.`);
+   }
+ }
+diff --git a/lib/module/createNanoIconsSet.web.js b/lib/module/createNanoIconsSet.web.js
+index 4579513bb8be6686ce71d05a5f968f85dc8ac56d..7b088c53cee1d0353f807862b7b9999d19c8a3be 100644
+--- a/lib/module/createNanoIconsSet.web.js
++++ b/lib/module/createNanoIconsSet.web.js
+@@ -8,8 +8,8 @@ import { useDynamicFontStatus } from "./loadDynamicFont.js";
+ import { jsx as _jsx } from "react/jsx-runtime";
+ export { shallowEqualColor };
+ async function loadFontFromDevServer(family) {
+-  if (__DEV__) {
+-    const dev = require('./devServerFont');
++  if (typeof __DEV__ !== 'undefined' && __DEV__) {
++    const dev = await import('./devServerFont.web.js');
+     return dev.loadFontFromDevServer(family);
+   }
+   return false;
+diff --git a/lib/module/fontIntegrity.js b/lib/module/fontIntegrity.js
+index 147602d05bbf63fa97e89aab1b21f70d9d4b3bad..6cb119894820a44c0b125dc79d8eb040d3f4550f 100644
+--- a/lib/module/fontIntegrity.js
++++ b/lib/module/fontIntegrity.js
+@@ -54,7 +54,7 @@ async function reportDynamicFontIssue(family, message, cause) {
+   if (await isFontRegistered(family)) return;
+   if (NanoIconsFontLoader) {
+     recordIssue(family, 'dynamic', message, cause);
+-  } else if (__DEV__) {
++  } else if ((typeof __DEV__ !== 'undefined' && __DEV__)) {
+     warnRuntime(message, ...causeDetail(cause));
+   }
+ }
+@@ -72,7 +72,7 @@ function recordIssue(family, linking, message, cause) {
+     })
+   };
+   issues.set(family, issue);
+-  if (__DEV__) warnRuntime(message, ...causeDetail(cause));
++  if ((typeof __DEV__ !== 'undefined' && __DEV__)) warnRuntime(message, ...causeDetail(cause));
+   for (const listener of listeners) listener(issue, 'found');
+ }
+ export function resolveFontIssue(family) {
+diff --git a/lib/module/utils/validateLayerColor.js b/lib/module/utils/validateLayerColor.js
+index e15d58118482303a08b4a3664e63b3eebb2cb626..726e5c613a20c4ce20cef940861ea17671b1cb6e 100644
+--- a/lib/module/utils/validateLayerColor.js
++++ b/lib/module/utils/validateLayerColor.js
+@@ -13,7 +13,7 @@ export function validateLayerColor(value, iconName, layerIndex) {
+     validityByString.set(value, valid);
+   }
+   if (valid) return value;
+-  if (__DEV__) {
++  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+     const key = `${iconName}\u0000${value}`;
+     if (!reportedInvalid.has(key)) {
+       reportedInvalid.add(key);

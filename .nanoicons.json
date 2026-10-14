@@ -1,0 +1,10 @@
+{
+    "iconSets": [
+        {
+            "fontFamily": "ReproIcons",
+            "inputDir": "./icons-src",
+            "linking": "dynamic",
+            "outputDir": "./assets"
+        }
+    ]
+}
