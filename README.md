@@ -3,7 +3,7 @@
 Minimal Next.js 16.3.1 (webpack, App Router) + react-native-web 0.21.2 app that
 renders icons from react-native-nano-icons 1.0.0. It reproduces the issues we hit
 when the library's web renderer and CLI run in this kind of setup, and carries a
-proposed fix for all of them.
+proposed fix for issues 1 to 4.
 
     bun install
     bun run icons          # builds the font from icons-src/
@@ -16,8 +16,12 @@ proposed fix for all of them.
 | 2 | `require('./devServerFont')` inside an ESM file | `VARIANT=define-dev bun run dev` | `Cannot find module './devServerFont'` in the server log |
 | 3 | Same as 1, in a production build | `VARIANT=baseline bun run build` | build succeeds but logs the `ReferenceError` while prerendering |
 | 4 | The CLI parser assumes `getAttribute()` returns `null` for a missing attribute | `bun run icons:xmldom-0.8` | every layer colour is `rgba(0,0,0,NaN)` |
+| 5 | Size and colour are inline styles, so CSS cannot set them | `bun run dev`, open `/web` | `.size-64` gives `12px`; a `color: red` parent gives `rgb(0, 0, 0)` |
+| 6 | The web renderer needs `react-native` to build | `VARIANT=no-rn bun run build` | `Failed to compile`, import trace `lib/module/loadDynamicFont.js` |
+| 7 | `memo` ignores accessibility props | `bun run dev`, open `/web` | after the label changes to `Second`, `aria-label` stays `First`; `aria-hidden` never appears |
 
-For 1 to 3, open http://localhost:3000 once and read the server log.
+For 1 to 3, open http://localhost:3000 once and read the server log. For 5 and 7
+the `/web` page prints expected and actual values.
 
 - **1 and 3**: nothing defines `__DEV__`, and Next.js does not.
 - **2**: `__DEV__` is defined as a boolean (`DefinePlugin`), so the web renderer takes
@@ -33,6 +37,22 @@ For 1 to 3, open http://localhost:3000 once and read the server log.
 
 The parser also loops over parent elements with `while (current !== null)`. That
 only shows once the attribute check is fixed, so both have to change together.
+
+- **5**: the renderer writes `width`, `height` and `font-size` from the `size`
+  prop, and each layer's `color` from the glyphmap, as inline styles. A class
+  cannot override them, so CSS cannot size an icon (including responsive sizes)
+  or colour it through `currentColor`.
+- **6**: `createNanoIconsSet.web.js` imports `loadDynamicFont.js`, which imports
+  `Image` and `Platform` from `react-native`. Without the alias webpack parses the
+  real `react-native` (installed here as a peer) and fails on its Flow syntax; a
+  project without it fails with `Can't resolve 'react-native'`. With the alias,
+  tree-shaking removes that code: the shipped JS is the same as with a two-line
+  stub (269,502 vs 269,499 bytes gzipped).
+- **7**: the `memo` comparator checks only `name`, `size`, `style`, `className`,
+  `tintMode` and `color`. A change to `accessibilityLabel`, `accessible`,
+  `accessibilityRole` or `testID` alone never reaches the DOM.
+
+There is no proposed fix for 5 to 7 yet.
 
 ## Proposed fix
 

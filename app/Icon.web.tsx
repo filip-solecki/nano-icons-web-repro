@@ -17,7 +17,7 @@ if (typeof document !== "undefined" && typeof FontFace !== "undefined") {
         .catch(() => undefined);
 }
 
-const NanoIcon = createNanoIconSet(glyphMap);
+export const NanoIcon = createNanoIconSet(glyphMap);
 
 export type IconName = "ic_circle" | "ic_opacity" | "ic_square" | "ic_star";
 
